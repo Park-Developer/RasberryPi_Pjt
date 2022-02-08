@@ -33,7 +33,8 @@ int main(){
         AI_value0 = analogRead (PCF + 0) ;
         AI_value1 = analogRead (PCF + 1) ;
         printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
- 
+        //printf("Resistor : %f \n" , AI_value0);
+
         // [90 Degree]
         softPwmWrite(SERVO,15); // neutral
         delay(2000);
@@ -41,7 +42,7 @@ int main(){
         AI_value0 = analogRead (PCF + 0) ;
         AI_value1 = analogRead (PCF + 1) ;
         printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
-
+        //printf("Resistor : %f \n" , AI_value0);
         // [180 Degree]
         softPwmWrite(SERVO,30);
         delay(2000);
@@ -49,7 +50,7 @@ int main(){
         AI_value0 = analogRead (PCF + 0) ;
         AI_value1 = analogRead (PCF + 1) ;
         printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
-
+        //printf("Resistor : %f \n" , AI_value0);
         // [90 Degree]
         softPwmWrite(SERVO,15); // neutral
         delay(2000);
@@ -57,7 +58,9 @@ int main(){
         AI_value0 = analogRead (PCF + 0) ;
         AI_value1 = analogRead (PCF + 1) ;
         printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
+        //printf("Resistor : %f \n" , AI_value0);
     }
+
 
     return 0;
 }
