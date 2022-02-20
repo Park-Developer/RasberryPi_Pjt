@@ -1,5 +1,75 @@
 #include "sensor.h"
 
+void make_recordInfo(FILE * enc1_descp,FILE * enc2_descp){
+    // [Common Property]
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char Record_year[20];
+    char Record_month[20];
+    char Record_day[20];
+    char Record_hour[20];
+    char Record_min[20];
+    char Record_sec[20];
+    
+    sprintf(Record_year, "%d", tm.tm_year+1900);
+    sprintf(Record_month, "%d", tm.tm_mon+1);
+    sprintf(Record_day, "%d", tm.tm_mday);
+    sprintf(Record_hour, "%d", tm.tm_hour);
+    sprintf(Record_min, "%d", tm.tm_min);
+    sprintf(Record_sec, "%d", tm.tm_sec);
+
+    // [Encoder1 File Setting]
+    fputs("[Encoder1 Data]\n", enc1_descp);
+    fputs("-Record Date : ",enc1_descp);
+    fputs(Record_year, enc1_descp);
+    fputs(Record_month, enc1_descp);
+    fputs(Record_day, enc1_descp);
+
+    fputs("\n-Record Time : ",enc1_descp);
+    fputs(Record_hour, enc1_descp);
+    fputs(Record_min, enc1_descp);
+    fputs(Record_sec, enc1_descp);
+
+    fputs("\n-Col1 : time[ms]",enc1_descp);
+    fputs("\n-Col2 : distance[cm]\n",enc1_descp);
+    fputs("\n\n", enc1_descp);
+
+    // [Encoder2 File Setting]
+    fputs("[Encoder2 Data]\n", enc2_descp);
+    fputs("-Record Date : ",enc2_descp);
+    fputs(Record_year, enc2_descp);
+    fputs(Record_month, enc2_descp);
+    fputs(Record_day, enc2_descp);
+
+    fputs("\n-Record Time : ",enc2_descp);
+    fputs(Record_hour, enc2_descp);
+    fputs(Record_min, enc2_descp);
+    fputs(Record_sec, enc2_descp);
+
+    fputs("\n-Col1 : time[ms]",enc2_descp);
+    fputs("\n-Col2 : distance[cm]\n",enc2_descp);
+    fputs("\n\n", enc2_descp);
+}
+
+char* measure_dist(int encoder_count){
+    //double dist_per_pitch=(WHEEL_LENGTH/ENCODER_PITCH_NUMBER);
+    static char measure_dist[DATA_RECORD_SIZE];
+
+    sprintf(measure_dist, "%f",encoder_count*(((double)WHEEL_LENGTH/ENCODER_PITCH_NUMBER)));
+    // recore unit : CM
+    return measure_dist;
+}
+
+void record_encoder_data(FILE * file_descp,double record_time,int enc_cnt){
+    char number_str[DATA_RECORD_SIZE];
+
+    sprintf(number_str, "%f", record_time/1000); // [ms] 단위로 저장(double -> String)
+    strcat(number_str,",");
+    strcat(number_str,measure_dist(enc_cnt));
+    strcat(number_str,"\n");  
+
+    fputs(number_str, file_descp);   
+}
 
 void *env_sensing(){
     while(1){
@@ -43,80 +113,13 @@ Ultra_Data ultra_sensing(){
     int u2_err_cnt=0;
 
     while(1){
-        /*
-        // Ultra Sensor1 Echo HIGH Check
-        if(digitalRead(ULTRA_1_ECHO)==HIGH && ultra1_start==false && ultra1_sensing==false){
-            ultra1_start=true;
-            U1_startTime = micros();
-            printf("U1_startTime  %f",U1_startTime);
-        }
-
-        // Ultra Sensor2 Echo HIGH Check
-        if(digitalRead(ULTRA_2_ECHO)==HIGH && ultra2_start==false && ultra2_sensing==false){
-            ultra2_start=false;
-            U2_startTime = micros();
-             printf("U2_startTime  %f",U2_startTime);
-        }
-
-        // Ultra Sensor2 Echo LOW Check
-        if(digitalRead(ULTRA_1_ECHO)==LOW && ultra1_start==true && ultra1_sensing==false){
-            U1_travelTime = micros() - U1_startTime;
-            U1_distance = U1_travelTime / 58;
-            ultra1_sensing=true;
-
-        }
-
-        // Ultra Sensor2 Echo LOW Check
-        if(digitalRead(ULTRA_2_ECHO)==LOW && ultra2_start==true && ultra2_sensing==false){
-            U2_travelTime = micros() - U2_startTime;
-            U2_distance = U2_travelTime / 58;
-            ultra2_sensing=true;
-        }
-        
-        // Normal Case
-        if (ultra1_sensing==true && ultra2_sensing==true){
-            result.err_no=0;
-            strcpy(result.err_msg," ");
-            result.u1_dist=U1_distance;
-            result.u2_dist=U2_distance;
-
-            break;
-        }
-
-        // Abnormal Case1
-        if(ultra1_sensing==true && ultra2_sensing==false){
-            u1_err_cnt++;
-            
-            if (u1_err_cnt>RETRY_CHECK_NUMBER){
-                result.err_no=2;
-                strcpy(result.err_msg,"ERROR_MSG_2"); // ori : strcpy(result.err_msg,ERROR_MSG_2);
-                result.u1_dist=U1_distance;
-                result.u2_dist=-1;
-
-                break;
-            }
-        }
-
-        // Abnormal Case2
-        if(ultra1_sensing==false && ultra2_sensing==true){
-            u2_err_cnt++;
-            
-            if (u2_err_cnt>RETRY_CHECK_NUMBER){
-                result.err_no=1;
-                strcpy(result.err_msg,"ERROR_MSG_1"); // ori : strcpy(result.err_msg,ERROR_MSG_1)
-                result.u1_dist=-1;
-                result.u2_dist=U2_distance;
-
-                break;
-            }
-        }
-        */  
-    long U1_startTime;
-    long U1_travelTime;
-    int U1_distance=0;
+    
+        long U1_startTime;
+        long U1_travelTime;
+        int U1_distance=0;
         long U2_startTime;
-    long U2_travelTime;
-    int U2_distance=0;
+        long U2_travelTime;
+        int U2_distance=0;
     
 
                //초음파 발생코드
@@ -167,8 +170,21 @@ Encoder_Data encoder_sensing(){
 
     Encoder_Data enc_data;
 
+    // [File Record Setting]
+    struct timeval  tv;
+	double start_measure, enc1_stamp, enc2_stamp;
+    //enc1_stamp : ENC1 경과 시간
+    //enc2_stamp : ENC2 경과 시간
 
-    // count if state change
+    gettimeofday(&tv, NULL);
+	start_measure = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+    FILE *enc1_fp = fopen(ENCODER1_DATA_FILE, "w");    
+    FILE *enc2_fp = fopen(ENCODER2_DATA_FILE, "w");   
+
+    // Data Record Info
+    make_recordInfo(enc1_fp,enc2_fp); 
+    
+    // [Read & Record Encoder Value]
     while(1){ // ori: while(encoder_sensing_state){
       
 
@@ -180,10 +196,16 @@ Encoder_Data encoder_sensing(){
             
             }
 
+            // Data Record
             enc_data.enc1_record[encoder1_cnt].record_time=micros();
             enc_data.enc1_record[encoder1_cnt].accum_cnt=encoder1_cnt;
             
-            past_enc1_state=digitalRead(ENCODER_1);
+            gettimeofday(&tv, NULL);
+            enc1_stamp= (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            
+            record_encoder_data(enc1_fp,enc1_stamp,encoder1_cnt);
+
+            past_enc1_state=digitalRead(ENCODER_1); // 이전 상태 저장
         }
         
         if(digitalRead(ENCODER_2) != past_enc2_state){
@@ -194,14 +216,22 @@ Encoder_Data encoder_sensing(){
             
             }
 
+            // Data Record
             enc_data.enc2_record[encoder2_cnt].record_time=micros();
             enc_data.enc2_record[encoder2_cnt].accum_cnt=encoder2_cnt;
         
-            past_enc2_state=digitalRead(ENCODER_2);
+            gettimeofday(&tv, NULL);
+            enc2_stamp= (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            
+            record_encoder_data(enc2_fp,enc2_stamp,encoder2_cnt);
+
+            past_enc2_state=digitalRead(ENCODER_2); // 이전 상태 저장
         }
 
     }
     
+    fclose(enc1_fp); 
+    fclose(enc2_fp); 
     return enc_data;
 }
 
@@ -242,3 +272,4 @@ void *ir_servo_sensing(){
      
     }
 }
+

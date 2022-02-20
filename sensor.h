@@ -48,6 +48,10 @@ Function Definition
 void *encoder_on();
 void *env_sensing();
 void *ir_servo_sensing();
+void make_Encoder_recordInfo(FILE * enc1_descp,FILE * enc2_descp);
+void record_encoder_data(FILE * file_descp,double record_time,int enc_cnt); // record encoder data in txt file
+char* measure_dist(int encoder_count); // measure distance using encoder count
+
 
 Ultra_Data ultra_sensing();
 Encoder_Data encoder_sensing();

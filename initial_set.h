@@ -11,6 +11,8 @@
 #include <string.h>
 #include <math.h>
 #include <pcf8591.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 // I/O Setting
 #define RUN_SIGNAL 12 // BCM_GPIO 10
@@ -36,6 +38,14 @@
 #define ERR_MSG_SIZE 30 
 
 #define PCF_ADDRESS 120
+
+// Mobility Setting
+#define WHEEL_LENGTH 22 // Unit : cm
+#define ENCODER_PITCH_NUMBER 27
+
+#define ENCODER1_DATA_FILE "enc1_data.txt"
+#define ENCODER2_DATA_FILE "enc2_data.txt"
+#define DATA_RECORD_SIZE 150
 
 // [SENSOR SETTING]
 void init_set();
