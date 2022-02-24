@@ -30,7 +30,7 @@ void make_recordInfo(FILE * enc1_descp,FILE * enc2_descp){
     fputs(Record_min, enc1_descp);
     fputs(Record_sec, enc1_descp);
 
-    fputs("\n-Col1 : time[ms]",enc1_descp);
+    fputs("\n-Col1 : time[sec]",enc1_descp);
     fputs("\n-Col2 : distance[cm]\n",enc1_descp);
     fputs("\n\n", enc1_descp);
 
@@ -46,7 +46,7 @@ void make_recordInfo(FILE * enc1_descp,FILE * enc2_descp){
     fputs(Record_min, enc2_descp);
     fputs(Record_sec, enc2_descp);
 
-    fputs("\n-Col1 : time[ms]",enc2_descp);
+    fputs("\n-Col1 : time[sec]",enc2_descp);
     fputs("\n-Col2 : distance[cm]\n",enc2_descp);
     fputs("\n\n", enc2_descp);
 }
@@ -63,7 +63,7 @@ char* measure_dist(int encoder_count){
 void record_encoder_data(FILE * file_descp,double record_time,int enc_cnt){
     char number_str[DATA_RECORD_SIZE];
 
-    sprintf(number_str, "%f", record_time/1000); // [ms] 단위로 저장(double -> String)
+    sprintf(number_str, "%f", record_time/1000000); // [sec] 단위로 저장(double -> String)
     strcat(number_str,",");
     strcat(number_str,measure_dist(enc_cnt));
     strcat(number_str,"\n");  
@@ -177,7 +177,7 @@ Encoder_Data encoder_sensing(){
     //enc2_stamp : ENC2 경과 시간
 
     gettimeofday(&tv, NULL);
-	start_measure = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	start_measure = micros(); // ori : (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
     FILE *enc1_fp = fopen(ENCODER1_DATA_FILE, "w");    
     FILE *enc2_fp = fopen(ENCODER2_DATA_FILE, "w");   
 
@@ -188,7 +188,7 @@ Encoder_Data encoder_sensing(){
     while(1){ // ori: while(encoder_sensing_state){
       
 
-        if(digitalRead(ENCODER_1) != past_enc1_state){
+        if(digitalRead(ENCODER_1) != past_enc1_state && digitalRead(ENCODER_1)==1){
             printf("ENC1 %d\n",encoder1_cnt);
             encoder1_cnt= encoder1_cnt+1;
             if (encoder1_cnt>=ENCODER_DATA_SIZE){
@@ -197,18 +197,18 @@ Encoder_Data encoder_sensing(){
             }
 
             // Data Record
-            enc_data.enc1_record[encoder1_cnt].record_time=micros();
+            enc_data.enc1_record[encoder1_cnt].record_time=micros()-start_measure;
             enc_data.enc1_record[encoder1_cnt].accum_cnt=encoder1_cnt;
             
             gettimeofday(&tv, NULL);
-            enc1_stamp= (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            enc1_stamp= enc_data.enc1_record[encoder1_cnt].record_time; //ori : (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
             
             record_encoder_data(enc1_fp,enc1_stamp,encoder1_cnt);
 
             past_enc1_state=digitalRead(ENCODER_1); // 이전 상태 저장
         }
         
-        if(digitalRead(ENCODER_2) != past_enc2_state){
+        if(digitalRead(ENCODER_2) != past_enc2_state && digitalRead(ENCODER_2)==1){
             printf("ENC2 %d\n",encoder2_cnt);
             encoder2_cnt= encoder2_cnt+1;
             if (encoder2_cnt>=ENCODER_DATA_SIZE){
@@ -217,11 +217,11 @@ Encoder_Data encoder_sensing(){
             }
 
             // Data Record
-            enc_data.enc2_record[encoder2_cnt].record_time=micros();
+            enc_data.enc2_record[encoder2_cnt].record_time=micros()-start_measure;
             enc_data.enc2_record[encoder2_cnt].accum_cnt=encoder2_cnt;
         
             gettimeofday(&tv, NULL);
-            enc2_stamp= (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            enc2_stamp=enc_data.enc2_record[encoder2_cnt].record_time; //(tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
             
             record_encoder_data(enc2_fp,enc2_stamp,encoder2_cnt);
 

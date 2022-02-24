@@ -9,15 +9,22 @@ void *motor_control(void *arg)
     
 
 
-    while(1){
+    //while(1){
         softPwmWrite(MOTOR_PWM,100);  
-        delay(1000);
+        //delay(1000);
         
-        softPwmWrite(MOTOR_PWM,50);
-        delay(1000);
-    }
+        //softPwmWrite(MOTOR_PWM,50);
+        //delay(1000);
+    //}
 return NULL;
 
 }
 
- 
+void set_max_speed(){
+
+}
+
+void set_min_speed(){
+
+}
+
