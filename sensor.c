@@ -1,4 +1,109 @@
 #include "sensor.h"
+extern int _TCP_SOCKET; // TCP socket with Web server
+
+int encoder1_cnt=0;
+int encoder2_cnt=0;
+double velocity_list[10]={0,};
+int velocity_cnt=0;
+double CUR_VELOCITY=0;
+double TARGET_VELOCITY=12.55; // PWM 40 average speed
+int PWM_VAL=40;
+
+void *measure_velocity(){
+    printf("debug : velocity measuring start");
+    struct timeval  tv;
+	double begin, cur_stamp,prior_stamp;
+    prior_stamp=0;
+
+    FILE *velocity_fp = fopen("Motor_velocity.txt", "w"); 
+    
+    //    fputs("[Encoder1 Data]\n", enc1_descp);
+
+	gettimeofday(&tv, NULL);
+	begin = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+
+    double prior_dist=0;
+    double cur_dist=0;
+    double cur_velocity=0;
+
+    bool feedback_on=true; // feedback 세팅
+        int high_state=0;
+        int low_state=0;
+    while(1) { // 500ms 단위로 측정
+        gettimeofday(&tv, NULL);
+        cur_stamp = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+        
+        char sample_time[30];
+        char encoder_data[100];
+        char current_velocity[100];
+
+        // Sampling
+        int calc_sample=0;
+        double sample_begin_time=0;
+        double sample_end_time=0;
+        int sample_number=3;
+        int sampling_count=0;
+
+
+
+        if((cur_stamp-prior_stamp)>=500){ // 500ms 초과시
+            
+            sprintf(sample_time,"%f",(cur_stamp-begin));
+            fputs(sample_time,velocity_fp); // 진행시간 기록
+            fputs(", ",velocity_fp);     
+
+            cur_dist=encoder1_cnt*(((double)WHEEL_LENGTH/ENCODER_PITCH_NUMBER));
+            
+            sprintf(encoder_data,"%f",cur_dist);
+            fputs(encoder_data,velocity_fp); // 이동거리 기록
+            fputs(", ",velocity_fp);
+            
+         
+            //CUR_VELOCITY=(double)(cur_dist-prior_dist)*(1000)/(cur_stamp-prior_stamp);
+            CUR_VELOCITY=(double)((cur_dist-prior_dist)*1000)/(cur_stamp-prior_stamp);
+            printf(" [CUR_VELOCITY] %f ,%f ,%d\n",cur_stamp-prior_stamp, CUR_VELOCITY,PWM_VAL);
+            //printf(" PWM_VAL %d \n", PWM_VAL);
+            sprintf(current_velocity,"%f",CUR_VELOCITY);
+            fputs(current_velocity,velocity_fp); // 속도 기록
+            fputs("\n",velocity_fp);
+            
+            // FEEDBACK
+            //int high_state=0;
+            //int low_stat=0;
+
+            if (feedback_on==true){               
+                if(CUR_VELOCITY>TARGET_VELOCITY){
+                    low_state=0;
+                    high_state=high_state+1;
+                    if(high_state==3){
+                        //printf("high state!");
+                        PWM_VAL=PWM_VAL-1;
+                        softPwmWrite(MOTOR_PWM,PWM_VAL);
+                        high_state=0;
+                    }
+                    
+                }else if(CUR_VELOCITY<TARGET_VELOCITY){
+                    high_state=0;
+                    low_state=low_state+1;
+                    if(low_state==3){
+                           //printf("low state!");
+                    PWM_VAL=PWM_VAL+1;
+                    softPwmWrite(MOTOR_PWM,PWM_VAL);
+                    low_state=0;
+                    }
+                }
+            } 
+            
+            prior_stamp=cur_stamp;
+            prior_dist=cur_dist;
+            // FEEDBACK
+        }
+
+
+    }
+
+
+}
 
 void make_recordInfo(FILE * enc1_descp,FILE * enc2_descp){
     // [Common Property]
@@ -72,6 +177,7 @@ void record_encoder_data(FILE * file_descp,double record_time,int enc_cnt){
 }
 
 void *env_sensing(){
+  
     while(1){
         ultra_sensing();
     }
@@ -136,7 +242,7 @@ Ultra_Data ultra_sensing(){
         U1_travelTime = micros() - U1_startTime;
         U1_distance = U1_travelTime / 58;
   
-        if(U1_distance < 400) printf( "Distance1: %dcm\n", U1_distance);
+        //if(U1_distance < 400) printf( "Distance1: %dcm\n", U1_distance);
         delay(500);
 
         //초음파 발생코드
@@ -153,20 +259,19 @@ Ultra_Data ultra_sensing(){
         U2_travelTime = micros() - U2_startTime;
         U2_distance = U2_travelTime / 58;
   
-        if(U2_distance < 400) printf( "Distance2: %dcm\n", U2_distance);
+        //if(U2_distance < 400) printf( "Distance2: %dcm\n", U2_distance);
         delay(500);   
     }
 
-    printf("Ultra1 Sensing : %d\n", U1_distance);
-    printf("Ultra2 Sensing : %d\n", U2_distance);
+    //printf("Ultra1 Sensing : %d\n", U1_distance);
+    //printf("Ultra2 Sensing : %d\n", U2_distance);
     return result;
 }
 
 Encoder_Data encoder_sensing(){
     int past_enc1_state=digitalRead(ENCODER_1);
     int past_enc2_state=digitalRead(ENCODER_2);
-    int encoder1_cnt=0;
-    int encoder2_cnt=0;
+
 
     Encoder_Data enc_data;
 
@@ -185,15 +290,86 @@ Encoder_Data encoder_sensing(){
     make_recordInfo(enc1_fp,enc2_fp); 
     
     // [Read & Record Encoder Value]
-    while(1){ // ori: while(encoder_sensing_state){
-      
+    double enc1_term=0;
+    double enc1_cur_stamp=0;
+    double enc1_past_stamp=0;
+    double enc_sum=0;
+    char tcp_sendData[100]="TCP end";
+    printf("TCP SOCKET %d", _TCP_SOCKET);
 
+
+    // TCP SETIUP
+    socklen_t clen; // 소켓 디스크립터 정의
+	int n;
+	struct sockaddr_in servaddr, cliaddr; // 구조체 정의
+	char mesg[BUFSIZ];
+
+	// 소켓 생성j
+	if((_TCP_SOCKET=socket(AF_INET,SOCK_STREAM,0))<0){
+		perror("socket()");
+		//return -1;
+	}
+    printf("tCP socket(ini) %d" , _TCP_SOCKET);
+    // 주소 구조체에 주소 지정
+	memset(&servaddr,0,sizeof(servaddr));
+	servaddr.sin_family=AF_INET;
+	servaddr.sin_addr.s_addr=inet_addr("192.168.219.101");
+	servaddr.sin_port=htons(TCP_PORT); // 사용할 포트 지정
+
+    // bind 함수를 사용하여 서버 소켓의 주소 설정
+	if(bind(_TCP_SOCKET,(struct sockaddr *)&servaddr,sizeof(servaddr))<0){
+		perror("bind()");
+		//return -1;	
+	}
+	
+	// 동시에 접속하는 클라이언트의 처리를 위한 대기 큐를 설정
+	if(listen(_TCP_SOCKET,8)<0){ // 최대 8개의 클라이언트가 동시 접속 대기할 수 있도록 설정
+		perror("listen()");
+		//return -1;
+	} 
+
+    clen=sizeof(cliaddr);
+    char addr[100]; // TCP Client Address
+    char sene_msg[100]="test message"; // send message
+        
+    int rn, csock = accept(_TCP_SOCKET,(struct sockaddr *)&cliaddr,&clen);
+
+    // 네트워크 주소를 문자열로 변경
+    inet_ntop(AF_INET,&cliaddr.sin_addr,addr,sizeof(addr));
+    printf("Client is conneted : %s\n",addr); 
+    //  TCP SETUP
+
+
+
+
+    while(1){ // ori: while(encoder_sensing_state){
+        /*
+        ### ENCODER1 SENSING ###
+        */
         if(digitalRead(ENCODER_1) != past_enc1_state && digitalRead(ENCODER_1)==1){
-            printf("ENC1 %d\n",encoder1_cnt);
-            encoder1_cnt= encoder1_cnt+1;
-            if (encoder1_cnt>=ENCODER_DATA_SIZE){
-                encoder1_cnt=0; // count reset
+            enc1_cur_stamp=(micros()-start_measure);
+
             
+            enc_sum=enc_sum+(enc1_cur_stamp-enc1_past_stamp);
+            printf("ENC1 TERM %f \n",enc1_cur_stamp-enc1_past_stamp);
+            
+            // TCP PART
+            //snprintf(tcp_sendData,sizeof(tcp_sendData),"%f",enc_sum);
+            printf("TCP SOCKET %d", _TCP_SOCKET);
+            
+            if(write(_TCP_SOCKET,tcp_sendData,sizeof(tcp_sendData))<=0){
+			    perror("write()");
+            }
+       
+            // TCP PART
+
+            enc1_past_stamp=enc1_cur_stamp;
+            //printf("ENC1 %d\n",encoder1_cnt);
+            encoder1_cnt= encoder1_cnt+1;
+            if (encoder1_cnt>=13){
+                //printf("ENC1 AVG %f \n",enc_sum/13);
+                encoder1_cnt=0; // count reset
+                enc_sum=0;
             }
 
             // Data Record
@@ -207,9 +383,12 @@ Encoder_Data encoder_sensing(){
 
             past_enc1_state=digitalRead(ENCODER_1); // 이전 상태 저장
         }
-        
+
+        /*
+        ### ENCODER2 SENSING ###
+        */
         if(digitalRead(ENCODER_2) != past_enc2_state && digitalRead(ENCODER_2)==1){
-            printf("ENC2 %d\n",encoder2_cnt);
+            //printf("ENC2 %d\n",encoder2_cnt);
             encoder2_cnt= encoder2_cnt+1;
             if (encoder2_cnt>=ENCODER_DATA_SIZE){
                 encoder2_cnt=0; // count reset
@@ -227,7 +406,7 @@ Encoder_Data encoder_sensing(){
 
             past_enc2_state=digitalRead(ENCODER_2); // 이전 상태 저장
         }
-
+        
     }
     
     fclose(enc1_fp); 
@@ -244,31 +423,31 @@ void *ir_servo_sensing(){
         // [0 Degree]
         softPwmWrite(SERVO_MOTOR,1);
         delay(2000);
-        printf("0 deg :");
+        //printf("0 deg :");
         AI_value0 = analogRead (PCF_ADDRESS + 0) ;
-        printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
+        //printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
       
 
         // [90 Degree]
         softPwmWrite(SERVO_MOTOR,15); // neutral
         delay(2000);
-        printf("90 deg :");
+        //printf("90 deg :");
         AI_value0 = analogRead (PCF_ADDRESS + 0) ;
-        printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
+        //printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
 
         // [180 Degree]
         softPwmWrite(SERVO_MOTOR,30);
         delay(2000);
-        printf("180 deg :");
+        //printf("180 deg :");
         AI_value0 = analogRead (PCF_ADDRESS + 0) ;
-        printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
+        //printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
        
         // [90 Degree]
         softPwmWrite(SERVO_MOTOR,15); // neutral
         delay(2000);
-        printf("90 deg :");
+        //printf("90 deg :");
         AI_value0 = analogRead (PCF_ADDRESS + 0) ;
-        printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
+        //printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
      
     }
 }

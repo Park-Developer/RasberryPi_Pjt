@@ -11,13 +11,14 @@ int main(int argc, char **argv){
 	struct sockaddr_in servaddr, cliaddr;
 	socklen_t len;
 	char mesg[1000];
-	
+	char* send_msg="HELLO!";
+	//strcpy(send_msg,"youhu!!!\n");
 	sockfd=socket(AF_INET,SOCK_DGRAM,0); // UDP 소켓 생성
 	
 	// 접속되는 클라이언트를 위한 주소 설정 후 운영체제에 서비스 등록
 	memset(&servaddr,0,sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr =inet_addr("169.254.42.23");
+	servaddr.sin_addr.s_addr =inet_addr("192.168.219.101");
 	servaddr.sin_port = htons(UDP_PORT);
 	
 	bind(sockfd,(struct sockaddr *)&servaddr, sizeof(servaddr));
@@ -26,7 +27,8 @@ int main(int argc, char **argv){
 	do{
 		len=sizeof(cliaddr);
 		n=recvfrom(sockfd,mesg,1000,0,(struct sockaddr *)&cliaddr, &len);
-		sendto(sockfd, mesg,n,0,(struct sockaddr *)&cliaddr, sizeof(cliaddr));		
+		
+		//sendto(sockfd, send_msg,strlen(send_msg),0,(struct sockaddr *)&cliaddr, sizeof(cliaddr));		
 		
 		mesg[n]='\0';
 		printf("Received data : %s\n",mesg);

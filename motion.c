@@ -1,4 +1,6 @@
 #include "motion.h"
+extern double CUR_VELOCITY;
+extern double TARGET_VELOCITY;
 
 void *motor_control(void *arg)
 {
@@ -9,13 +11,15 @@ void *motor_control(void *arg)
     
 
 
-    //while(1){
-        softPwmWrite(MOTOR_PWM,100);  
-        //delay(1000);
-        
-        //softPwmWrite(MOTOR_PWM,50);
-        //delay(1000);
-    //}
+    //PRWM40 average velocity : 12.55cm/s
+    
+    softPwmWrite(MOTOR_PWM,500);  // Intial Velocity Setting
+
+    // Velocity Feedback with average
+    
+
+
+ 
 return NULL;
 
 }

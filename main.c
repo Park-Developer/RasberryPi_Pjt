@@ -5,11 +5,13 @@
 #include "interruption.h"
 
 
+extern int _TCP_SOCKET; // TCP socket with Web server
 pthread_mutex_t mid;
 
 int main(int argc,char **argv){
+    
     init_set();
-
+    printf("pr start!");
     // Signal Setting
     signal_setting();
  
@@ -17,14 +19,16 @@ int main(int argc,char **argv){
     //encoder_sensing_state=true;
 
     // Thread Setting
-    pthread_t motor_ctrl, encoder_rd, env_sensors_rd, ir_servo_rd;
+    pthread_t motor_ctrl, encoder_rd, env_sensors_rd, ir_servo_rd, velocity_ms;
     pthread_mutex_init(&mid,NULL);
 
+    //pthread_create(&velocity_ms,NULL,measure_velocity,NULL);
     pthread_create(&motor_ctrl,NULL,motor_control,NULL);
     pthread_create(&encoder_rd,NULL,encoder_on,NULL);
     pthread_create(&env_sensors_rd,NULL,env_sensing,NULL);
     pthread_create(&ir_servo_rd,NULL,ir_servo_sensing,NULL);
 
+    pthread_join(velocity_ms,NULL);
     pthread_join(motor_ctrl,NULL);
     pthread_join(encoder_rd,NULL);
     pthread_join(env_sensors_rd,NULL);
@@ -32,6 +36,7 @@ int main(int argc,char **argv){
     
     pthread_mutex_destroy(&mid);
 
+    close(_TCP_SOCKET); 
     return 0;
 }
 

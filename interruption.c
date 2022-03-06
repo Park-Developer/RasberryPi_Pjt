@@ -1,6 +1,6 @@
 #include "interruption.h"
 
-
+extern int _TCP_SOCKET; // TCP socket with Web server
 
 void signal_setting(){
     signal(SIGINT, cmd_exit);
@@ -18,6 +18,10 @@ void cmd_exit(int sig){
     // Motor Stop
     
         printf("this program will be exited in 3 seconds..\n");
+        
+        /*
+        1. DC Motor Off
+        */
         pinMode(3,OUTPUT);
         digitalWrite(3,LOW); // gpio22
         
@@ -29,5 +33,11 @@ void cmd_exit(int sig){
 
         pinMode(6,OUTPUT);
         digitalWrite(6,LOW); // gpio25
+        
+        /*
+        2. TCP socket clost 
+        */
+        close(_TCP_SOCKET); 
+        
         exit(0);
 } 

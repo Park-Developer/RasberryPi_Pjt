@@ -13,6 +13,8 @@
 #include <pcf8591.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 // I/O Setting
 #define RUN_SIGNAL 12 // BCM_GPIO 10
@@ -52,8 +54,11 @@ void init_set();
 void motor_setting();
 void sensor_setting();
 void safety_setting();
-
+void communication_setting();
 // [Global Variable Setting]
 
+
+// [Communication Setting]
+#define TCP_PORT 5101
 
 #endif
