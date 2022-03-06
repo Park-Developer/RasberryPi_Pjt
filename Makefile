@@ -126,6 +126,33 @@ Wono_o_Bot-1.0.out/fast:
 	$(MAKE) -f CMakeFiles/Wono_o_Bot-1.0.out.dir/build.make CMakeFiles/Wono_o_Bot-1.0.out.dir/build
 .PHONY : Wono_o_Bot-1.0.out/fast
 
+communi.o: communi.c.o
+
+.PHONY : communi.o
+
+# target to build an object file
+communi.c.o:
+	$(MAKE) -f CMakeFiles/Wono_o_Bot-1.0.out.dir/build.make CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o
+.PHONY : communi.c.o
+
+communi.i: communi.c.i
+
+.PHONY : communi.i
+
+# target to preprocess a source file
+communi.c.i:
+	$(MAKE) -f CMakeFiles/Wono_o_Bot-1.0.out.dir/build.make CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.i
+.PHONY : communi.c.i
+
+communi.s: communi.c.s
+
+.PHONY : communi.s
+
+# target to generate assembly for a file
+communi.c.s:
+	$(MAKE) -f CMakeFiles/Wono_o_Bot-1.0.out.dir/build.make CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.s
+.PHONY : communi.c.s
+
 initial_set.o: initial_set.c.o
 
 .PHONY : initial_set.o
@@ -270,6 +297,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Wono_o_Bot-1.0.out"
 	@echo "... edit_cache"
+	@echo "... communi.o"
+	@echo "... communi.i"
+	@echo "... communi.s"
 	@echo "... initial_set.o"
 	@echo "... initial_set.i"
 	@echo "... initial_set.s"

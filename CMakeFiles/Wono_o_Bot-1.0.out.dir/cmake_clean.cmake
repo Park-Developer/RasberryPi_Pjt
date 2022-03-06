@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o"
   "CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o"
   "CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o"
   "CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o"

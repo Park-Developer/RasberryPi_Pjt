@@ -1,4 +1,5 @@
 #include "initial_set.h"
+#include "communi.h"
 #include "error.h"
 #include "sensor.h"
 #include "motion.h"
@@ -9,15 +10,19 @@ extern int _TCP_SOCKET; // TCP socket with Web server
 pthread_mutex_t mid;
 
 int main(int argc,char **argv){
-    
+    // Intial Setting
     init_set();
-    printf("pr start!");
-    // Signal Setting
-    signal_setting();
+    printf("Project start!");
+    interrupt_setting(); // Interruption Setting
  
-    digitalWrite(RUN_SIGNAL,HIGH); // Run signal ON 
-    //encoder_sensing_state=true;
-
+    // TCP Communication Setting
+    pTCP_COMMU tcp_info;
+    tcp_info=set_TCP();
+    printf("Connected Client Address : %s \n",tcp_info->cli_address);
+    
+    /*
+    여기 있는애들 구조체의 함수로 전부 바꾸기 for tcp 통신에 대한 정보 전달을 위함
+    */
     // Thread Setting
     pthread_t motor_ctrl, encoder_rd, env_sensors_rd, ir_servo_rd, velocity_ms;
     pthread_mutex_init(&mid,NULL);

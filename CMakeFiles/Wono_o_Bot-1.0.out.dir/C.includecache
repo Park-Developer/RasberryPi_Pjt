@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/pi/rasp_pjt/communi.h
+initial_set.h
+/home/pi/rasp_pjt/initial_set.h
+
 /home/pi/rasp_pjt/error.h
 
 /home/pi/rasp_pjt/initial_set.h
@@ -40,9 +44,29 @@ sys/socket.h
 arpa/inet.h
 -
 
-/home/pi/rasp_pjt/sensor.c
+/home/pi/rasp_pjt/interruption.h
+initial_set.h
+/home/pi/rasp_pjt/initial_set.h
 sensor.h
 /home/pi/rasp_pjt/sensor.h
+
+/home/pi/rasp_pjt/main.c
+initial_set.h
+/home/pi/rasp_pjt/initial_set.h
+communi.h
+/home/pi/rasp_pjt/communi.h
+error.h
+/home/pi/rasp_pjt/error.h
+sensor.h
+/home/pi/rasp_pjt/sensor.h
+motion.h
+/home/pi/rasp_pjt/motion.h
+interruption.h
+/home/pi/rasp_pjt/interruption.h
+
+/home/pi/rasp_pjt/motion.h
+initial_set.h
+/home/pi/rasp_pjt/initial_set.h
 
 /home/pi/rasp_pjt/sensor.h
 initial_set.h

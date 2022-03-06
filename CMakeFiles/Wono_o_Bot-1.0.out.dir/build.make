@@ -60,9 +60,22 @@ include CMakeFiles/Wono_o_Bot-1.0.out.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 
+CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
+CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o: communi.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o"
+	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o   -c /home/pi/rasp_pjt/communi.c
+
+CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.i"
+	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/pi/rasp_pjt/communi.c > CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.i
+
+CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.s"
+	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/pi/rasp_pjt/communi.c -o CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.s
+
 CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o: initial_set.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o"
 	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o   -c /home/pi/rasp_pjt/initial_set.c
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.i: cmake_force
@@ -75,7 +88,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.s: cmake_force
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: interruption.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o"
 	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o   -c /home/pi/rasp_pjt/interruption.c
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.i: cmake_force
@@ -88,7 +101,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.s: cmake_force
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o: motion.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o"
 	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o   -c /home/pi/rasp_pjt/motion.c
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.i: cmake_force
@@ -101,7 +114,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.s: cmake_force
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: sensor.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o"
 	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o   -c /home/pi/rasp_pjt/sensor.c
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.i: cmake_force
@@ -114,7 +127,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.s: cmake_force
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o: CMakeFiles/Wono_o_Bot-1.0.out.dir/flags.make
 CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o: main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o"
 	gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o   -c /home/pi/rasp_pjt/main.c
 
 CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.i: cmake_force
@@ -127,6 +140,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.s: cmake_force
 
 # Object files for target Wono_o_Bot-1.0.out
 Wono_o_Bot__1_0_out_OBJECTS = \
+"CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o" \
 "CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o" \
 "CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o" \
 "CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o" \
@@ -136,6 +150,7 @@ Wono_o_Bot__1_0_out_OBJECTS = \
 # External object files for target Wono_o_Bot-1.0.out
 Wono_o_Bot__1_0_out_EXTERNAL_OBJECTS =
 
+Wono_o_Bot-1.0.out: CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o
 Wono_o_Bot-1.0.out: CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o
 Wono_o_Bot-1.0.out: CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o
 Wono_o_Bot-1.0.out: CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o
@@ -146,7 +161,7 @@ Wono_o_Bot-1.0.out: /usr/lib/libwiringPi.so
 Wono_o_Bot-1.0.out: /usr/lib/arm-linux-gnueabihf/libpthread.so
 Wono_o_Bot-1.0.out: /usr/lib/arm-linux-gnueabihf/libm.so
 Wono_o_Bot-1.0.out: CMakeFiles/Wono_o_Bot-1.0.out.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking C executable Wono_o_Bot-1.0.out"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/rasp_pjt/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking C executable Wono_o_Bot-1.0.out"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Wono_o_Bot-1.0.out.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

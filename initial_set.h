@@ -49,16 +49,17 @@
 #define ENCODER2_DATA_FILE "enc2_data.txt"
 #define DATA_RECORD_SIZE 150
 
-// [SENSOR SETTING]
+/* [SENSOR SETTING] */
+#define SENSOR_NUMBER 7
 void init_set();
 void motor_setting();
 void sensor_setting();
 void safety_setting();
 void communication_setting();
-// [Global Variable Setting]
+void signal_setting();
 
-
-// [Communication Setting]
+/* [Communication Setting]*/
 #define TCP_PORT 5101
+
 
 #endif

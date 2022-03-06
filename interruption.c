@@ -2,7 +2,7 @@
 
 extern int _TCP_SOCKET; // TCP socket with Web server
 
-void signal_setting(){
+void interrupt_setting(){
     signal(SIGINT, cmd_exit);
    
 }

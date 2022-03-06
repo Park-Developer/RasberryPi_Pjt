@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/home/pi/rasp_pjt/communi.c" "/home/pi/rasp_pjt/CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o"
   "/home/pi/rasp_pjt/initial_set.c" "/home/pi/rasp_pjt/CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o"
   "/home/pi/rasp_pjt/interruption.c" "/home/pi/rasp_pjt/CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o"
   "/home/pi/rasp_pjt/main.c" "/home/pi/rasp_pjt/CMakeFiles/Wono_o_Bot-1.0.out.dir/main.c.o"

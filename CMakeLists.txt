@@ -14,7 +14,9 @@ SET ( CMAKE_VERBOSE_MAKEFILE true )
 SET ( OUTPUT_ELF
         "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.out"
         )
+        
 SET ( SRC_FILES
+        communi.c
         initial_set.c
         interruption.c
         motion.c

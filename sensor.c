@@ -1,6 +1,6 @@
 #include "sensor.h"
 extern int _TCP_SOCKET; // TCP socket with Web server
-
+char *TCP_SENSOR_MSG;
 int encoder1_cnt=0;
 int encoder2_cnt=0;
 double velocity_list[10]={0,};
@@ -294,6 +294,9 @@ Encoder_Data encoder_sensing(){
     double enc1_cur_stamp=0;
     double enc1_past_stamp=0;
     double enc_sum=0;
+    
+    /* < 2022.03.07 01:24 origin Code >
+    
     char tcp_sendData[100]="TCP end";
     printf("TCP SOCKET %d", _TCP_SOCKET);
 
@@ -338,6 +341,10 @@ Encoder_Data encoder_sensing(){
     inet_ntop(AF_INET,&cliaddr.sin_addr,addr,sizeof(addr));
     printf("Client is conneted : %s\n",addr); 
     //  TCP SETUP
+
+
+
+    
     if ((rn=read(csock, mesg,sizeof(mesg)))<=0)	
 	{perror("read()");
     }
@@ -345,7 +352,7 @@ Encoder_Data encoder_sensing(){
 
 	printf("Received Data : %s\n",mesg);
 
-
+    */
 
     while(1){ // ori: while(encoder_sensing_state){
         /*
@@ -358,7 +365,7 @@ Encoder_Data encoder_sensing(){
             enc_sum=enc_sum+(enc1_cur_stamp-enc1_past_stamp);
             printf("ENC1 TERM %f \n",enc1_cur_stamp-enc1_past_stamp);
             
-            // TCP PART
+            /* TCP PART
             //snprintf(tcp_sendData,sizeof(tcp_sendData),"%f",enc_sum);
             printf("TCP SOCKET %d", _TCP_SOCKET);
             
@@ -367,7 +374,7 @@ Encoder_Data encoder_sensing(){
             }
        
 
-            // TCP PART
+             TCP PART*/
 
             enc1_past_stamp=enc1_cur_stamp;
             //printf("ENC1 %d\n",encoder1_cnt);
