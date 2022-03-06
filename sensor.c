@@ -338,7 +338,12 @@ Encoder_Data encoder_sensing(){
     inet_ntop(AF_INET,&cliaddr.sin_addr,addr,sizeof(addr));
     printf("Client is conneted : %s\n",addr); 
     //  TCP SETUP
+    if ((rn=read(csock, mesg,sizeof(mesg)))<=0)	
+	{perror("read()");
+    }
+	 	
 
+	printf("Received Data : %s\n",mesg);
 
 
 
@@ -357,10 +362,11 @@ Encoder_Data encoder_sensing(){
             //snprintf(tcp_sendData,sizeof(tcp_sendData),"%f",enc_sum);
             printf("TCP SOCKET %d", _TCP_SOCKET);
             
-            if(write(_TCP_SOCKET,tcp_sendData,sizeof(tcp_sendData))<=0){
+            if(write(csock,tcp_sendData,sizeof(tcp_sendData))<=0){
 			    perror("write()");
             }
        
+
             // TCP PART
 
             enc1_past_stamp=enc1_cur_stamp;
