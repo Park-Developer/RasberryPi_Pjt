@@ -1,6 +1,8 @@
 #include "interruption.h"
 
-extern int _TCP_SOCKET; // TCP socket with Web server
+extern int COMMAND_TCP_SOCKET;
+extern int SENSING_TCP_SOCKET;
+extern char* COMMAND;
 
 void interrupt_setting(){
     signal(SIGINT, cmd_exit);
@@ -37,7 +39,15 @@ void cmd_exit(int sig){
         /*
         2. TCP socket clost 
         */
-        close(_TCP_SOCKET); 
-        
+     
+
+        char interrup_msg[50]="sensor_out";
+
+        if(write(SENSING_TCP_SOCKET,interrup_msg,sizeof(interrup_msg))<=0)
+		    perror("write()");
+
+        close(COMMAND_TCP_SOCKET);
+        close(SENSING_TCP_SOCKET);
+
         exit(0);
 } 

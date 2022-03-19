@@ -16,12 +16,13 @@ SET ( OUTPUT_ELF
         )
         
 SET ( SRC_FILES
+        main.c
         communi.c
         initial_set.c
         interruption.c
         motion.c
         sensor.c
-        main.c
+
         )
  
 # 공통 컴파일러

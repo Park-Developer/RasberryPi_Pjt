@@ -60,6 +60,6 @@ void signal_setting();
 
 /* [Communication Setting]*/
 #define TCP_PORT 5101
-
+#define TCP_PORT2 5102
 
 #endif

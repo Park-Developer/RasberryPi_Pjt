@@ -2,6 +2,8 @@
 #define __SENSOR_H__
 #include "initial_set.h"
 #include "error.h"
+#include "communi.h"
+
 /*
 ******************************
 Variable Definition
@@ -58,5 +60,23 @@ void *measure_velocity();
 
 Ultra_Data ultra_sensing();
 Encoder_Data encoder_sensing();
+
+
+/*
+Struct for Sensor Data Handling & Interface
+*/
+typedef struct _SENSOR_MODULE{
+    // Member Variable
+    int sensor_number;
+    pTCP_COMMU tcp_mod; // pTCP_COMMU 구조체 포인터 멤버
+    
+    // Member Function
+    void *(*encoder_AON)(); // AON : Always On 
+    void *(*detect_AON)();
+    void *(*ir_servo_AON)();
+    
+} SENSOR_MODULE, *pSENSOR_MODULE;
+
+pSENSOR_MODULE set_sensor_module();
 
 #endif

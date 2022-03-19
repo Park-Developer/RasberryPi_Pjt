@@ -8,6 +8,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/communi.c.o: initial_set.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o: initial_set.c
 CMakeFiles/Wono_o_Bot-1.0.out.dir/initial_set.c.o: initial_set.h
 
+CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: communi.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: error.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: initial_set.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/interruption.c.o: interruption.c
@@ -26,6 +27,7 @@ CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o: initial_set.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o: motion.c
 CMakeFiles/Wono_o_Bot-1.0.out.dir/motion.c.o: motion.h
 
+CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: communi.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: error.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: initial_set.h
 CMakeFiles/Wono_o_Bot-1.0.out.dir/sensor.c.o: sensor.c

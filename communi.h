@@ -4,6 +4,9 @@
 #define SEND_SENSOR_NUMBER 20 // 보낼 수 있는 센서의 개수
 #define SEND_MESSAGE_SIZE 300 // 송신 메세지의 크기
 
+/*
+Struct for TCP Interface Setting 
+*/
 typedef struct _TCP_COMMU{
     int tcp_port; // tcp domain
     int cli_sock; // client socket(fd)
@@ -15,5 +18,7 @@ typedef struct _TCP_COMMU{
 } TCP_COMMU, *pTCP_COMMU;
 
 pTCP_COMMU set_TCP();
+
+void *real_time_tcp();
 
 #endif

@@ -1,6 +1,11 @@
 #include "sensor.h"
-extern int _TCP_SOCKET; // TCP socket with Web server
-char *TCP_SENSOR_MSG;
+
+extern int COMMAND_TCP_SOCKET;
+extern int SENSING_TCP_SOCKET;
+extern char* COMMAND;
+
+extern pthread_mutex_t mid;
+
 int encoder1_cnt=0;
 int encoder2_cnt=0;
 double velocity_list[10]={0,};
@@ -37,7 +42,7 @@ void *measure_velocity(){
         char encoder_data[100];
         char current_velocity[100];
 
-        // Sampling
+        // Samplingss
         int calc_sample=0;
         double sample_begin_time=0;
         double sample_end_time=0;
@@ -177,15 +182,186 @@ void record_encoder_data(FILE * file_descp,double record_time,int enc_cnt){
 }
 
 void *env_sensing(){
-  
+    printf("Ultrasonic Sensor start");
+    
+    pinMode (ULTRA_1_TRIG, OUTPUT);
+    pinMode (ULTRA_1_ECHO, INPUT);
+    pinMode (ULTRA_2_TRIG, OUTPUT);
+    pinMode (ULTRA_2_ECHO, INPUT);
+    
+    bool ultra1_sensing=false;
+    bool ultra2_sensing=false;
+    bool ultra1_start=false;
+    bool ultra2_start=false;
+
+    long U1_startTime=0;
+    long U1_travelTime=0;
+    int U1_distance=0;
+    long U2_startTime=0;
+    long U2_travelTime=0;
+    int U2_distance=0;
+
+
+    int u1_err_cnt=0;
+    int u2_err_cnt=0;
+    
+    bool ultra1_use=false;
+    bool ultra2_use=true;
+    
     while(1){
-        ultra_sensing();
+        if(ultra1_use==true){
+            digitalWrite (ULTRA_1_TRIG, LOW);
+            delayMicroseconds(2);
+            digitalWrite (ULTRA_1_TRIG, HIGH);
+            delayMicroseconds(20);
+            digitalWrite (ULTRA_1_TRIG, LOW);
+            
+            //거리측정코드
+            while(digitalRead(ULTRA_1_ECHO) == LOW);
+            U1_startTime = micros();
+            while(digitalRead(ULTRA_1_ECHO) == HIGH);
+            U1_travelTime = micros() - U1_startTime;
+            U1_distance = U1_travelTime / 58;
+            printf("Ultra1 Sensing : %d\n", U1_distance);
+            delay(500);
+        }
+  
+        if(ultra2_use==true){
+            digitalWrite (ULTRA_2_TRIG, LOW);
+            delayMicroseconds(2);
+            digitalWrite (ULTRA_2_TRIG, HIGH);
+            delayMicroseconds(20);
+            digitalWrite (ULTRA_2_TRIG, LOW);
+            
+            //거리측정코드
+            while(digitalRead(ULTRA_2_ECHO) == LOW);
+            U2_startTime = micros();
+            while(digitalRead(ULTRA_2_ECHO) == HIGH);
+            U2_travelTime = micros() - U2_startTime;
+            U2_distance = U2_travelTime / 58;
+    
+            //if(U2_distance < 400) printf( "Distance2: %dcm\n", U2_distance);
+               pthread_mutex_lock(&mid);
+            //printf("Ultra1 Sensing : %d\n", U1_distance);
+            printf("Ultra2 Sensing : %d\n", U2_distance);
+               pthread_mutex_unlock(&mid);
+            delay(500);   
+        }
     }
+
+
 }
 
 void *encoder_on(){
     
-    encoder_sensing();
+    int past_enc1_state=digitalRead(ENCODER_1);
+    int past_enc2_state=digitalRead(ENCODER_2);
+
+
+    Encoder_Data enc_data;
+
+    // [File Record Setting]
+    struct timeval  tv;
+	double start_measure, enc1_stamp, enc2_stamp;
+    //enc1_stamp : ENC1 경과 시간
+    //enc2_stamp : ENC2 경과 시간
+
+    gettimeofday(&tv, NULL);
+	start_measure = micros(); // ori : (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+    FILE *enc1_fp = fopen(ENCODER1_DATA_FILE, "w");    
+    FILE *enc2_fp = fopen(ENCODER2_DATA_FILE, "w");   
+
+    // Data Record Info
+    make_recordInfo(enc1_fp,enc2_fp); 
+    
+    // [Read & Record Encoder Value]
+    double enc1_term=0;
+    double enc1_cur_stamp=0;
+    double enc1_past_stamp=0;
+    double enc_sum=0;
+    
+    double stop_time=start_measure;
+
+
+    char sensor_msg[100]="sensor_msg\n"; 
+    while(1){ // ori: while(encoder_sensing_state){
+        /*
+        ### ENCODER1 SENSING ###
+        */
+        char mesg[BUFSIZ];
+        if(write(SENSING_TCP_SOCKET,sensor_msg,sizeof(sensor_msg))<=0)
+		    perror("write()");
+
+        memset(mesg,0,BUFSIZ);
+        if(recv(SENSING_TCP_SOCKET,mesg,BUFSIZ,0)<=0){ // 데이터를 소켓으로부터 읽음
+            perror("recv()");
+            return -1;
+        }
+        
+        if (encoder1_cnt==0 || encoder2_cnt==0){
+            if ((micros()-stop_time)>1000000){
+                //printf("Robot Stop State");
+                stop_time=micros();
+            }
+            
+        }
+
+        if(digitalRead(ENCODER_1) != past_enc1_state && digitalRead(ENCODER_1)==1){
+            enc1_cur_stamp=(micros()-start_measure);
+
+            
+            enc_sum=enc_sum+(enc1_cur_stamp-enc1_past_stamp);
+            pthread_mutex_lock(&mid);
+            printf("ENC1 TERM %f \n",enc1_cur_stamp-enc1_past_stamp);
+            pthread_mutex_unlock(&mid);
+            enc1_past_stamp=enc1_cur_stamp;
+            //printf("ENC1 %d\n",encoder1_cnt);
+            encoder1_cnt= encoder1_cnt+1;
+            if (encoder1_cnt>=13){
+                //printf("ENC1 AVG %f \n",enc_sum/13);
+                encoder1_cnt=0; // count reset
+                enc_sum=0;
+            }
+
+            // Data Record
+            enc_data.enc1_record[encoder1_cnt].record_time=micros()-start_measure;
+            enc_data.enc1_record[encoder1_cnt].accum_cnt=encoder1_cnt;
+            
+            gettimeofday(&tv, NULL);
+            enc1_stamp= enc_data.enc1_record[encoder1_cnt].record_time; //ori : (tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            
+            record_encoder_data(enc1_fp,enc1_stamp,encoder1_cnt);
+
+            past_enc1_state=digitalRead(ENCODER_1); // 이전 상태 저장
+        }
+
+        /*
+        ### ENCODER2 SENSING ###
+        */
+        if(digitalRead(ENCODER_2) != past_enc2_state && digitalRead(ENCODER_2)==1){
+            //printf("ENC2 %d\n",encoder2_cnt);
+            encoder2_cnt= encoder2_cnt+1;
+            if (encoder2_cnt>=ENCODER_DATA_SIZE){
+                encoder2_cnt=0; // count reset
+            
+            }
+
+            // Data Record
+            enc_data.enc2_record[encoder2_cnt].record_time=micros()-start_measure;
+            enc_data.enc2_record[encoder2_cnt].accum_cnt=encoder2_cnt;
+        
+            gettimeofday(&tv, NULL);
+            enc2_stamp=enc_data.enc2_record[encoder2_cnt].record_time; //(tv.tv_sec) * 1000 + ((tv.tv_usec) / 1000)-start_measure;
+            
+            record_encoder_data(enc2_fp,enc2_stamp,encoder2_cnt);
+
+            past_enc2_state=digitalRead(ENCODER_2); // 이전 상태 저장
+        }
+        
+    }
+    
+    fclose(enc1_fp); 
+    fclose(enc2_fp); 
 }
 
 Ultra_Data ultra_sensing(){
@@ -263,8 +439,8 @@ Ultra_Data ultra_sensing(){
         delay(500);   
     }
 
-    //printf("Ultra1 Sensing : %d\n", U1_distance);
-    //printf("Ultra2 Sensing : %d\n", U2_distance);
+    printf("Ultra1 Sensing : %d\n", U1_distance);
+    printf("Ultra2 Sensing : %d\n", U2_distance);
     return result;
 }
 
@@ -442,10 +618,10 @@ void *ir_servo_sensing(){
       
 
         // [90 Degree]
-        softPwmWrite(SERVO_MOTOR,15); // neutral
-        delay(2000);
-        //printf("90 deg :");
-        AI_value0 = analogRead (PCF_ADDRESS + 0) ;
+        softPwmWrite(SERVO_MOTOR ,15); // neutral
+        delay(2000); 
+        //printf("90 deg :"); 
+        AI_value0 = analogRead ( PCF_ADDRESS + 0) ;
         //printf("volt : %f , dist : %lf\n" , AI_value0*3.3/256,pow((AI_value0*3.3/256),-1.173)*29.988);
 
         // [180 Degree]
@@ -465,3 +641,19 @@ void *ir_servo_sensing(){
     }
 }
 
+pSENSOR_MODULE set_sensor_module(pTCP_COMMU tcp_mod_struct){
+    // [pointer to return]
+    pSENSOR_MODULE result_ptr=malloc(sizeof(pSENSOR_MODULE));
+
+    // [struct member setting]
+    result_ptr->sensor_number=SENSOR_NUMBER;
+    result_ptr->tcp_mod=tcp_mod_struct;
+
+    // [struct function setting]
+    result_ptr->encoder_AON=encoder_on;
+    result_ptr->detect_AON=env_sensing;
+    result_ptr->ir_servo_AON=ir_servo_sensing;
+
+    return result_ptr;
+
+}

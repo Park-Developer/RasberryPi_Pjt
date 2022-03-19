@@ -1,8 +1,10 @@
 #include "initial_set.h"
-int _TCP_SOCKET;
-
+int COMMAND_TCP_SOCKET;
+int SENSING_TCP_SOCKET;
+char* COMMAND;
 void init_set(){
     // GPIO Setting
+    printf("initial setting...");
     if(wiringPiSetup()==-1){
         printf("wiringpi error");
         exit(-1);
